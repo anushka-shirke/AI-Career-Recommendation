@@ -3,18 +3,19 @@ import streamlit as st
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Career Recommender", layout="wide")
 
-# ---------------- GLOBAL CSS ----------------
+# ---------------- SAFE CSS ----------------
 st.markdown("""
 <style>
+
 /* Background */
 .stApp {
     background: linear-gradient(135deg, #0f172a, #1e293b);
     color: white;
 }
 
-/* Section Titles */
+/* Section Title */
 .section-title {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 600;
     margin-bottom: 15px;
 }
@@ -25,31 +26,37 @@ st.markdown("""
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 15px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     color: white;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 /* Best Card */
 .best-card {
     background: linear-gradient(135deg, #16a34a, #22c55e);
-    color: white;
     padding: 20px;
     border-radius: 12px;
-    font-weight: 500;
     margin-bottom: 20px;
+    color: white;
 }
 
-/* Inputs */
-input, textarea {
-    background-color: #0f172a !important;
+/* ✅ FIX ALL SELECTBOXES */
+div[data-baseweb="select"] > div {
+    background-color: #1e293b !important;
     color: white !important;
 }
 
-/* Labels */
-label {
-    color: white !important;
-    font-weight: 500;
+div[role="listbox"] {
+    background-color: #1e293b !important;
 }
+
+div[role="option"] {
+    color: white !important;
+}
+
+div[role="option"]:hover {
+    background-color: #334155 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -60,29 +67,70 @@ col1, col2 = st.columns(2)
 
 with col1:
     aptitude = st.number_input("Aptitude Score", 0, 100, 85)
-    interest = st.selectbox("Interest", ["Data Science", "AI", "Web Development"])
+
+    interest = st.selectbox(
+        "Interest",
+        [
+            "Data Science",
+            "AI",
+            "Web Development",
+            "Cyber Security",
+            "Cloud Computing",
+            "Software Engineering"
+        ]
+    )
 
 with col2:
     academics = st.number_input("Academic Performance", 0, 100, 75)
-    personality = st.selectbox("Personality Type", ["Realistic", "Investigative", "Artistic"])
+
+    personality = st.selectbox(
+        "Personality Type",
+        [
+            "Realistic",
+            "Investigative",
+            "Artistic",
+            "Social",
+            "Enterprising",
+            "Conventional"
+        ]
+    )
 
 skills = st.text_area("Skills", "Python, AWS, SQL, Linux")
-goal = st.selectbox("Career Goal", ["Data Scientist", "AI Engineer", "Software Engineer"])
+
+goal = st.selectbox(
+    "Career Goal",
+    [
+        "Data Scientist",
+        "AI Engineer",
+        "Software Engineer",
+        "Cloud Engineer",
+        "Cybersecurity Analyst"
+    ]
+)
 
 # ---------------- BUTTON ----------------
 if st.button("Get Recommendations 🚀"):
 
-    # ---------------- RESULTS ----------------
+    # 👉 Replace this later with your ML model output
+    results = [
+        ("Data Scientist", 48.41, 8.52),
+        ("ML/AI Engineer", 40.59, 7.80),
+        ("Data Analyst", 35.20, 7.10),
+        ("Cloud Engineer", 30.15, 6.50),
+        ("Software Developer", 28.75, 6.20),
+    ]
+
     st.markdown('<div class="section-title">🏆 Your Top Career Recommendations</div>', unsafe_allow_html=True)
 
     # Best Match
-    st.markdown("""
+    best = results[0]
+    st.markdown(f"""
     <div class="best-card">
-        <b>Best Match:</b> Data Scientist — Final Score: 48.41%
+        <b>Best Match:</b> {best[0]} — Final Score: {best[1]}%
     </div>
     """, unsafe_allow_html=True)
 
-    # ---------------- CARD FUNCTION ----------------
+    # Card Function
     def show_card(rank, career, score, confidence):
         st.markdown(f"""
         <div class="card">
@@ -93,27 +141,13 @@ if st.button("Get Recommendations 🚀"):
         </div>
         """, unsafe_allow_html=True)
 
-    # ---------------- DISPLAY TOP 5 ----------------
-    show_card(1, "Data Scientist", 48.41, 8.52)
-    show_card(2, "ML/AI Engineer", 40.59, 7.80)
-    show_card(3, "Data Analyst", 35.20, 7.10)
-    show_card(4, "Cloud Engineer", 30.15, 6.50)
-    show_card(5, "Software Developer", 28.75, 6.20)
+    # Show Top 5
+    for i, (career, score, conf) in enumerate(results, start=1):
+        show_card(i, career, score, conf)
 
-    # ---------------- PROGRESS SECTION ----------------
+    # ---------------- PROGRESS ----------------
     st.markdown('<div class="section-title">📊 Capability Match</div>', unsafe_allow_html=True)
 
-    st.write("Data Scientist")
-    st.progress(48)
-
-    st.write("ML/AI Engineer")
-    st.progress(40)
-
-    st.write("Data Analyst")
-    st.progress(35)
-
-    st.write("Cloud Engineer")
-    st.progress(30)
-
-    st.write("Software Developer")
-    st.progress(28)
+    for career, score, _ in results:
+        st.write(career)
+        st.progress(int(score))
