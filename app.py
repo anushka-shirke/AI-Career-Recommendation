@@ -26,7 +26,7 @@ st.markdown("""
         background-color: #f7f9fc;
     }
 
-    /* Remove excessive top padding */
+    /* Main container */
     .block-container {
         padding-top: 2rem;
         padding-bottom: 3rem;
@@ -62,7 +62,7 @@ st.markdown("""
         line-height: 1.6;
     }
 
-    /* Section titles */
+    /* Section title */
     .section-title {
         font-size: 26px;
         font-weight: 750;
@@ -71,16 +71,7 @@ st.markdown("""
         margin-bottom: 12px;
     }
 
-    /* Profile card */
-    .profile-card {
-        background: white;
-        border-radius: 20px;
-        padding: 28px 30px 25px 30px;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-        margin-bottom: 28px;
-    }
-
+    /* Profile description */
     .profile-description {
         color: #6b7280;
         font-size: 15px;
@@ -99,8 +90,44 @@ st.markdown("""
 
     /* Input labels */
     label {
-        font-weight: 600 !important;
         color: #374151 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Number input */
+    div[data-testid="stNumberInput"] input {
+        color: #111827 !important;
+        background-color: #ffffff !important;
+        caret-color: #111827 !important;
+    }
+
+    /* Number input buttons */
+    div[data-testid="stNumberInput"] button {
+        color: #111827 !important;
+        background-color: #f3f4f6 !important;
+    }
+
+    /* Select boxes */
+    div[data-baseweb="select"] > div {
+        background-color: #ffffff !important;
+        color: #111827 !important;
+    }
+
+    /* Select box text */
+    div[data-baseweb="select"] input {
+        color: #111827 !important;
+    }
+
+    /* Text area */
+    textarea {
+        color: #111827 !important;
+        background-color: #ffffff !important;
+        caret-color: #111827 !important;
+    }
+
+    /* General input text */
+    input {
+        color: #111827 !important;
     }
 
     /* Button */
@@ -147,12 +174,6 @@ st.markdown("""
         font-size: 25px;
     }
 
-    /* Divider */
-    hr {
-        margin-top: 25px;
-        margin-bottom: 25px;
-    }
-
     /* Footer */
     .footer {
         text-align: center;
@@ -177,7 +198,7 @@ def load_model():
 try:
     final_model = load_model()
     model_loaded = True
-except Exception as e:
+except Exception:
     model_loaded = False
     final_model = None
 
@@ -539,10 +560,7 @@ def build_user_features(
     }
 
     student["Overall_Aptitude"] = aptitude
-
-    student["Academic_Strength"] = (
-        academic_performance
-    )
+    student["Academic_Strength"] = academic_performance
 
     (
         programming_skill,
@@ -553,22 +571,11 @@ def build_user_features(
     ) = calculate_skill_scores(skills)
 
     student["Programming_Skill"] = programming_skill
+    student["Communication_Skill"] = communication_skill
+    student["Soft_Skills_Score"] = soft_skill_score
 
-    student["Communication_Skill"] = (
-        communication_skill
-    )
-
-    student["Soft_Skills_Score"] = (
-        soft_skill_score
-    )
-
-    student["Technical_Skill_Strength"] = (
-        technical_strength
-    )
-
-    student["Communication_Strength"] = (
-        communication_strength
-    )
+    student["Technical_Skill_Strength"] = technical_strength
+    student["Communication_Strength"] = communication_strength
 
     student["Career_Readiness_Score"] = (
         academic_performance * 0.5 +
@@ -584,13 +591,11 @@ def build_user_features(
 
 def final_recommend_career(student_profile):
 
-    student_df = pd.DataFrame(
-        [student_profile]
-    )
+    student_df = pd.DataFrame([student_profile])
 
-    probabilities = (
-        final_model.predict_proba(student_df)[0]
-    )
+    probabilities = final_model.predict_proba(
+        student_df
+    )[0]
 
     careers = final_model.classes_
 
@@ -599,14 +604,10 @@ def final_recommend_career(student_profile):
         "Confidence": probabilities * 100
     })
 
-    recommendations = (
-        recommendations
-        .sort_values(
-            by="Confidence",
-            ascending=False
-        )
-        .reset_index(drop=True)
-    )
+    recommendations = recommendations.sort_values(
+        by="Confidence",
+        ascending=False
+    ).reset_index(drop=True)
 
     return recommendations.head(5)
 
@@ -615,23 +616,16 @@ def final_recommend_career(student_profile):
 # GOAL ALIGNMENT
 # ============================================================
 
-def get_goal_alignment(
-    career_goal,
-    career
-):
+def get_goal_alignment(career_goal, career):
 
-    relevant_careers = (
-        goal_career_mapping.get(
-            career_goal,
-            []
-        )
+    relevant_careers = goal_career_mapping.get(
+        career_goal,
+        []
     )
 
     if career in relevant_careers:
 
-        position = (
-            relevant_careers.index(career)
-        )
+        position = relevant_careers.index(career)
 
         alignment_scores = [
             100,
@@ -642,9 +636,7 @@ def get_goal_alignment(
             50
         ]
 
-        if position < len(
-            alignment_scores
-        ):
+        if position < len(alignment_scores):
             return alignment_scores[position]
 
         return 50
@@ -656,14 +648,9 @@ def get_goal_alignment(
 # CAREER FIT ANALYSIS
 # ============================================================
 
-def analyze_career_fit(
-    student_profile,
-    career
-):
+def analyze_career_fit(student_profile, career):
 
-    requirements = (
-        career_requirements.get(career)
-    )
+    requirements = career_requirements.get(career)
 
     if requirements is None:
 
@@ -688,14 +675,12 @@ def analyze_career_fit(
     ).lower()
 
     matched_skills = []
-
     missing_skills = []
 
     for skill in requirements["skills"]:
 
         if skill.lower() in student_skills:
             matched_skills.append(skill)
-
         else:
             missing_skills.append(skill)
 
@@ -772,16 +757,11 @@ def calculate_final_scores(
     for _, row in recommendations.iterrows():
 
         career = row["Career"]
+        model_confidence = row["Confidence"]
 
-        model_confidence = (
-            row["Confidence"]
-        )
-
-        goal_alignment = (
-            get_goal_alignment(
-                student_profile["Career_Goal"],
-                career
-            )
+        goal_alignment = get_goal_alignment(
+            student_profile["Career_Goal"],
+            career
         )
 
         matched = len([
@@ -812,8 +792,7 @@ def calculate_final_scores(
         if total_required > 0:
 
             capability_match = (
-                matched /
-                total_required
+                matched / total_required
             ) * 100
 
         else:
@@ -821,10 +800,8 @@ def calculate_final_scores(
             capability_match = 50
 
         final_score = (
-            0.40 * model_confidence
-            +
-            0.30 * capability_match
-            +
+            0.40 * model_confidence +
+            0.30 * capability_match +
             0.30 * goal_alignment
         )
 
@@ -857,18 +834,12 @@ def calculate_final_scores(
                 )
         })
 
-    result_df = pd.DataFrame(
-        results
-    )
+    result_df = pd.DataFrame(results)
 
-    result_df = (
-        result_df
-        .sort_values(
-            by="Final_Score",
-            ascending=False
-        )
-        .reset_index(drop=True)
-    )
+    result_df = result_df.sort_values(
+        by="Final_Score",
+        ascending=False
+    ).reset_index(drop=True)
 
     result_df.insert(
         0,
@@ -889,9 +860,7 @@ def calculate_final_scores(
 st.markdown("""
 <div class="hero">
 
-    <h1>
-        🎯 AI Career Recommendation Engine
-    </h1>
+    <h1>🎯 AI Career Recommendation Engine</h1>
 
     <p>
         Discover the career paths that best match your
@@ -938,36 +907,38 @@ that best match your abilities and interests.
 
 
 # ============================================================
-# PROFILE INPUT CONTAINER
+# PROFILE INPUTS
 # ============================================================
 
 with st.container(border=True):
 
     # --------------------------------------------------------
-    # Aptitude + Academic Performance
+    # Aptitude Score + Academic Performance
     # --------------------------------------------------------
 
     col1, col2 = st.columns(2)
 
-with col1:
-    aptitude = st.number_input(
-        "Aptitude Score",
-        min_value=0,
-        max_value=100,
-        value=70,
-        step=1,
-        help="Enter your aptitude assessment score."
-    )
+    with col1:
 
-with col2:
-    academic_performance = st.number_input(
-        "Academic Performance",
-        min_value=0,
-        max_value=100,
-        value=75,
-        step=1,
-        help="Enter your overall academic performance."
-    )
+        aptitude = st.number_input(
+            "Aptitude Score",
+            min_value=0,
+            max_value=100,
+            value=70,
+            step=1,
+            help="Enter your aptitude assessment score."
+        )
+
+    with col2:
+
+        academic_performance = st.number_input(
+            "Academic Performance",
+            min_value=0,
+            max_value=100,
+            value=75,
+            step=1,
+            help="Enter your overall academic performance."
+        )
 
 
     # --------------------------------------------------------
@@ -1067,7 +1038,7 @@ with col2:
 
 
 # ============================================================
-# INITIAL INFORMATION
+# INFORMATION BEFORE RECOMMENDATION
 # ============================================================
 
 if not skills.strip():
@@ -1103,32 +1074,21 @@ if generate:
     else:
 
         student_profile = build_user_features(
-
             aptitude=aptitude,
-
             interest=interest,
-
             personality=personality,
-
-            academic_performance=
-                academic_performance,
-
+            academic_performance=academic_performance,
             skills=skills,
-
             career_goal=career_goal
         )
 
-        recommendations = (
-            final_recommend_career(
-                student_profile
-            )
+        recommendations = final_recommend_career(
+            student_profile
         )
 
-        final_results = (
-            calculate_final_scores(
-                student_profile,
-                recommendations
-            )
+        final_results = calculate_final_scores(
+            student_profile,
+            recommendations
         )
 
         st.session_state[
@@ -1146,17 +1106,13 @@ if generate:
 
 if "final_results" in st.session_state:
 
-    final_results = (
-        st.session_state[
-            "final_results"
-        ]
-    )
+    final_results = st.session_state[
+        "final_results"
+    ]
 
-    student_profile = (
-        st.session_state[
-            "student_profile"
-        ]
-    )
+    student_profile = st.session_state[
+        "student_profile"
+    ]
 
 
     # --------------------------------------------------------
@@ -1186,7 +1142,7 @@ if "final_results" in st.session_state:
 
 
     # --------------------------------------------------------
-    # Best Career Metrics
+    # Metrics
     # --------------------------------------------------------
 
     c1, c2, c3 = st.columns(3)
@@ -1331,17 +1287,11 @@ if "final_results" in st.session_state:
     display_df = final_results.copy()
 
     display_df.columns = [
-
         "Rank",
-
         "Career",
-
         "Model Confidence (%)",
-
         "Capability Match (%)",
-
         "Goal Alignment (%)",
-
         "Final Score (%)"
     ]
 
@@ -1353,7 +1303,7 @@ if "final_results" in st.session_state:
 
 
     # ========================================================
-    # DOWNLOAD
+    # DOWNLOAD RESULTS
     # ========================================================
 
     csv = (
@@ -1374,12 +1324,9 @@ if "final_results" in st.session_state:
     # RESET
     # ========================================================
 
-    if st.button(
-        "🔄 Start New Assessment"
-    ):
+    if st.button("🔄 Start New Assessment"):
 
         st.session_state.clear()
-
         st.rerun()
 
 
