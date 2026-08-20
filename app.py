@@ -127,7 +127,6 @@ skill_map = {
 # ---------------- BUTTON ----------------
 if st.button("Get Recommendations 🚀"):
 
-    # 👉 Replace this later with your ML model output
     results = [
         ("Data Scientist", 48.41, 8.52),
         ("ML/AI Engineer", 40.59, 7.80),
@@ -136,35 +135,24 @@ if st.button("Get Recommendations 🚀"):
         ("Software Developer", 28.75, 6.20),
     ]
 
-    st.markdown('<div class="section-title">🏆 Your Top Career Recommendations</div>', unsafe_allow_html=True)
+    # ✅ FUNCTION MUST BE SAME INDENT LEVEL AS results
+    def show_card(rank, career, score, confidence):
+        skills = skill_map.get(career, [])
 
-    # Best Match
-    best = results[0]
-    st.markdown(f"""
-    <div class="best-card">
-        <b>Best Match:</b> {best[0]} — Final Score: {best[1]}%
-    </div>
-    """, unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="card">
+            <h4>🏅 Rank #{rank}</h4>
+            <h2>{career}</h2>
+            <p><b>Final Score:</b> {score}%</p>
+            <p><b>Model Confidence:</b> {confidence}%</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # Card Function
-   def show_card(rank, career, score, confidence):
-    skills = skill_map.get(career, [])
+        if skills:
+            st.markdown("**🧠 Recommended Skills to Learn:**")
+            st.markdown(" ".join([f"`{s}`" for s in skills]))
 
-    st.markdown(f"""
-    <div class="card">
-        <h4>🏅 Rank #{rank}</h4>
-        <h2>{career}</h2>
-        <p><b>Final Score:</b> {score}%</p>
-        <p><b>Model Confidence:</b> {confidence}%</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # ✅ ADD THIS PART
-    if skills:
-        st.markdown("**🧠 Recommended Skills to Learn:**")
-        st.markdown(" ".join([f"`{s}`" for s in skills]))
-
-    # Show Top 5
+    # ✅ LOOP ALSO SAME LEVEL
     for i, (career, score, conf) in enumerate(results, start=1):
         show_card(i, career, score, conf)
 
