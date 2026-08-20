@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-st.title("🔥 TEST VERSION 999 🔥")
+
 # ============================================================
 # PAGE CONFIG
 # ============================================================
