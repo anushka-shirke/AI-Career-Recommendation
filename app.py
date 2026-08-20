@@ -949,25 +949,25 @@ with st.container(border=True):
 
     col1, col2 = st.columns(2)
 
-    with col1:
+with col1:
+    aptitude = st.number_input(
+        "Aptitude Score",
+        min_value=0,
+        max_value=100,
+        value=70,
+        step=1,
+        help="Enter your aptitude assessment score."
+    )
 
-        aptitude = st.slider(
-            "Aptitude Score",
-            min_value=0,
-            max_value=100,
-            value=70,
-            help="Enter your aptitude assessment score."
-        )
-
-    with col2:
-
-        academic_performance = st.slider(
-            "Academic Performance",
-            min_value=0,
-            max_value=100,
-            value=75,
-            help="Enter your overall academic performance."
-        )
+with col2:
+    academic_performance = st.number_input(
+        "Academic Performance",
+        min_value=0,
+        max_value=100,
+        value=75,
+        step=1,
+        help="Enter your overall academic performance."
+    )
 
 
     # --------------------------------------------------------
