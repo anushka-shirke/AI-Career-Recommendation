@@ -39,7 +39,7 @@ st.markdown("""
     color: white;
 }
 
-/* ✅ FIX ALL SELECTBOXES */
+/* Selectbox Fix */
 div[data-baseweb="select"] > div {
     background-color: #1e293b !important;
     color: white !important;
@@ -95,7 +95,7 @@ with col2:
         ]
     )
 
-skills = st.text_area("Skills", "Python, AWS, SQL, Linux")
+skills_input = st.text_area("Skills", "Python, AWS, SQL, Linux")
 
 goal = st.selectbox(
     "Career Goal",
@@ -107,23 +107,16 @@ goal = st.selectbox(
         "Cybersecurity Analyst"
     ]
 )
+
+# ---------------- SKILL MAP ----------------
 skill_map = {
-    "Data Scientist": [
-        "Python", "Machine Learning", "Statistics", "SQL", "Data Visualization"
-    ],
-    "ML/AI Engineer": [
-        "Deep Learning", "TensorFlow/PyTorch", "Python", "Model Deployment", "MLOps"
-    ],
-    "Data Analyst": [
-        "Excel", "SQL", "Power BI/Tableau", "Python", "Data Cleaning"
-    ],
-    "Cloud Engineer": [
-        "AWS/Azure", "Docker", "Kubernetes", "Linux", "Networking"
-    ],
-    "Software Developer": [
-        "Data Structures", "Algorithms", "Java/Python", "Git", "System Design"
-    ]
+    "Data Scientist": ["Python", "Machine Learning", "Statistics", "SQL", "Data Visualization"],
+    "ML/AI Engineer": ["Deep Learning", "TensorFlow/PyTorch", "Python", "Model Deployment", "MLOps"],
+    "Data Analyst": ["Excel", "SQL", "Power BI/Tableau", "Python", "Data Cleaning"],
+    "Cloud Engineer": ["AWS/Azure", "Docker", "Kubernetes", "Linux", "Networking"],
+    "Software Developer": ["Data Structures", "Algorithms", "Java/Python", "Git", "System Design"]
 }
+
 # ---------------- BUTTON ----------------
 if st.button("Get Recommendations 🚀"):
 
@@ -135,7 +128,15 @@ if st.button("Get Recommendations 🚀"):
         ("Software Developer", 28.75, 6.20),
     ]
 
-    # ✅ FUNCTION MUST BE SAME INDENT LEVEL AS results
+    # ---------------- BEST MATCH ----------------
+    best = results[0]
+    st.markdown(f"""
+    <div class="best-card">
+        <b>Best Match:</b> {best[0]} — Final Score: {best[1]}%
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ---------------- CARD FUNCTION ----------------
     def show_card(rank, career, score, confidence):
         skills = skill_map.get(career, [])
 
@@ -152,13 +153,20 @@ if st.button("Get Recommendations 🚀"):
             st.markdown("**🧠 Recommended Skills to Learn:**")
             st.markdown(" ".join([f"`{s}`" for s in skills]))
 
-    # ✅ LOOP ALSO SAME LEVEL
+    # ---------------- SHOW CARDS ----------------
     for i, (career, score, conf) in enumerate(results, start=1):
         show_card(i, career, score, conf)
 
-    # ---------------- PROGRESS ----------------
+    # ---------------- CAPABILITY MATCH ----------------
     st.markdown('<div class="section-title">📊 Capability Match</div>', unsafe_allow_html=True)
 
     for career, score, _ in results:
-        st.write(career)
+        col1, col2 = st.columns([4,1])
+
+        with col1:
+            st.write(f"**{career}**")
+
+        with col2:
+            st.write(f"**{score}%**")
+
         st.progress(int(score))
