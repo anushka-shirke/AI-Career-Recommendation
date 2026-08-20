@@ -107,7 +107,23 @@ goal = st.selectbox(
         "Cybersecurity Analyst"
     ]
 )
-
+skill_map = {
+    "Data Scientist": [
+        "Python", "Machine Learning", "Statistics", "SQL", "Data Visualization"
+    ],
+    "ML/AI Engineer": [
+        "Deep Learning", "TensorFlow/PyTorch", "Python", "Model Deployment", "MLOps"
+    ],
+    "Data Analyst": [
+        "Excel", "SQL", "Power BI/Tableau", "Python", "Data Cleaning"
+    ],
+    "Cloud Engineer": [
+        "AWS/Azure", "Docker", "Kubernetes", "Linux", "Networking"
+    ],
+    "Software Developer": [
+        "Data Structures", "Algorithms", "Java/Python", "Git", "System Design"
+    ]
+}
 # ---------------- BUTTON ----------------
 if st.button("Get Recommendations 🚀"):
 
@@ -131,15 +147,22 @@ if st.button("Get Recommendations 🚀"):
     """, unsafe_allow_html=True)
 
     # Card Function
-    def show_card(rank, career, score, confidence):
-        st.markdown(f"""
-        <div class="card">
-            <h4>🏅 Rank #{rank}</h4>
-            <h2>{career}</h2>
-            <p><b>Final Score:</b> {score}%</p>
-            <p><b>Model Confidence:</b> {confidence}%</p>
-        </div>
-        """, unsafe_allow_html=True)
+   def show_card(rank, career, score, confidence):
+    skills = skill_map.get(career, [])
+
+    st.markdown(f"""
+    <div class="card">
+        <h4>🏅 Rank #{rank}</h4>
+        <h2>{career}</h2>
+        <p><b>Final Score:</b> {score}%</p>
+        <p><b>Model Confidence:</b> {confidence}%</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ✅ ADD THIS PART
+    if skills:
+        st.markdown("**🧠 Recommended Skills to Learn:**")
+        st.markdown(" ".join([f"`{s}`" for s in skills]))
 
     # Show Top 5
     for i, (career, score, conf) in enumerate(results, start=1):
